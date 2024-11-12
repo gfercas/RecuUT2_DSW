@@ -1,5 +1,13 @@
 <?php
 session_start();
+
+function mostrarResultado($tipo) {
+    if(isset($_SESSION[$tipo]['resultado'])){
+        echo $_SESSION[$tipo]['resultado'];
+    } elseif(isset($_SESSION[$tipo]['error'])) {
+        echo "<div class='error'>" . $_SESSION[$tipo]['error'] . "</div>";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -17,11 +25,7 @@ session_start();
         <input type="submit" name="enviarBin" value="Calcular"><br>
     </form>
     <?php
-        if(isset($_SESSION['binario']['resultado'])){
-            echo $_SESSION['binario']['operacion'] . ' => ' . $_SESSION['binario']['resultado'];
-        }elseif(isset($_SESSION['binario']['error'])){
-            echo "<div class='error'>" . $_SESSION['binario']['error'] . "</div>";
-        }
+        mostrarResultado('binario');
     ?>
     <h2>Calculadora de fechas pasadas</h2>
     <form action="funciones.php" method="post">
@@ -29,11 +33,7 @@ session_start();
         <input type="submit" name="enviarFec" value="Calcular"><br>
     </form>
     <?php
-        if(isset($_SESSION['fecha']['resultado'])){
-            echo $_SESSION['fecha']['resultado'];
-        }elseif(isset($_SESSION['fecha']['error'])){
-            echo "<div class='error'>" . $_SESSION['fecha']['error'] . "</div>";
-        }
+        mostrarResultado('fecha');
     ?>
     <h2>Ordena mayor a menor</h2>
     <form action="funciones.php" method="post">
@@ -41,11 +41,7 @@ session_start();
         <input type="submit" name="enviarFor" value="Calcular"><br>
     </form>
     <?php
-        if(isset($_SESSION['formato']['resultado'])){
-            echo $_SESSION['formato']['resultado'];
-        }elseif(isset($_SESSION['formato']['error'])){
-            echo "<div class='error'>" . $_SESSION['formato']['error'] . "</div>";
-        }
+        mostrarResultado('formato');
     ?>
     <h2>Guardar notas</h2>
     <form action="funciones.php" method="post">
@@ -53,22 +49,14 @@ session_start();
         <input type="submit" name="enviarGNot" value="Guardar"><br>
     </form>
     <?php
-        if(isset($_SESSION['notas']['resultado'])){
-            echo $_SESSION['notas']['resultado'];
-        }elseif(isset($_SESSION['notas']['error'])){
-            echo "<div class='error'>" . $_SESSION['notas']['error'] . "</div>";
-        }
+        mostrarResultado('notas');
     ?>
     <h2>Ver notas</h2>
     <form action="funciones.php" method="post">
         <input type="submit" name="verNotas" value="Ver notas"><br>
     </form>
     <?php
-        if(isset($_SESSION['verNota']['resultado'])){
-            echo $_SESSION['verNota']['resultado'];
-        }elseif(isset($_SESSION['verNota']['error'])){
-            echo "<div class='error'>" . $_SESSION['verNota']['error'] . "</div>";
-        }
+        mostrarResultado('verNotas');
     ?>
     <h2>Comprobar Fibonacci</h2>
     <form action="funciones.php" method="post">
@@ -76,11 +64,7 @@ session_start();
         <input type="submit" name="enviarFib" value="Comprobar"><br>
     </form>
     <?php
-        if(isset($_SESSION['fibonacci']['resultado'])){
-            echo $_SESSION['fibonacci']['resultado'];
-        }elseif(isset($_SESSION['fibonacci']['error'])){
-            echo "<div class='error'>" . $_SESSION['fibonacci']['error'] . "</div>";
-        }
+        mostrarResultado('fibonacci');
     ?>
 </body>
 </html>
