@@ -1,5 +1,6 @@
 <?php
 session_start();
+define('RUTANOTAS', 'notas.json');
 
 /* Un función que reciba números binarios y nos devuelva su valor decimal y la operación realizada.
 Debes hacer la operación como si la estuvieras haciendo a mano, sin usar funciones predefinidas de php como bindec(). */
@@ -41,12 +42,112 @@ function calculadoraFecha($fecha){
 
 }
 
+/* Una función que reciba un texto en formato:
+      Jaime:89;Manolo:45;Paola:105;Merlina:6
+Y pinte estos datos ordenados de mayor a menor. No tiene que devolverlos en el 	mismo formato, sino pintarlos en la web. */
+function ordenaFormato($cadena){
+    if(!is_string($cadena) || strpos($cadena, ':') === false){
+        $_SESSION['formato']['error'] = 'Debes introducir un formato válido. Ej: Jaime:89;Manolo:45;Paola:105;Merlina:6';
+        return;
+    }
+    $formatoArray = [];
+    foreach(explode(';', $cadena) as $persona){
+        $item = explode(':', $persona);
+        $formatoArray[$item[1]] = $item[0];
+    }
+    krsort($formatoArray);
+    $_SESSION['formato']['resultado'] = '';
+    foreach($formatoArray as $num => $nombre){
+        $_SESSION['formato']['resultado'] .= "$nombre => $num<br>"; 
+    }
+}
+
+/* Una función que reciba un texto y nos los guarde en un JSON con la fecha y hora de inserción.*/
+function guardarNota($nota){
+    if(empty($nota)){
+        $_SESSION['notas']['error'] = 'Debes introducir una nota de texto';
+        return;
+    }
+    $notas = [];
+    try{
+        if(file_exists(RUTANOTAS)){
+            $notas = json_decode(file_get_contents(RUTANOTAS), 1);
+        }
+        $notas[date("Y-m-d H:i:s")] = $nota;
+        file_put_contents(RUTANOTAS, json_encode($notas));
+        $_SESSION['notas']['resultado'] = 'Nota guardada!';
+    }catch(Exception $e){
+        $_SESSION['notas']['error'] = 'Ha surgido un error del servidor.';
+        return;
+    }
+}
+
+/* Otra función que nos imprima todas esas notas guardadas en el JSON (con su fecha y hora, los mas recientes primero). */
+function verNotas(){
+    try{
+        $notas = [];
+        if(file_exists(RUTANOTAS)){
+            $notas = json_decode(file_get_contents(RUTANOTAS), 1);
+        }else{
+            $_SESSION['verNota']['error'] = 'No hay notas guardadas!';
+            return;
+        }
+        if(empty($notas)){
+            $_SESSION['verNota']['error'] = 'No hay notas guardadas!';
+            return;
+        }
+        $_SESSION['verNota']['resultado'] = '';
+        foreach(array_reverse($notas) as $fecha => $nota){
+            $_SESSION['verNota']['resultado'] .= "$fecha  =>  $nota <br><br>";
+        }
+    }catch(Exception $e){
+        $_SESSION['verNota']['error'] = 'Ha surgido un error del servidor.';
+        return;
+    }
+}
+
+/* Una función que reciba un número y compruebe si pertenece a la serie de Fibonacci. */
+function fibonacci(int $numero){
+    if(!is_numeric($numero)){
+        $_SESSION['fibonacci']['error'] = 'Debes introducir un número.';
+        return;
+    }
+    if($numero < 0){
+        $_SESSION['fibonacci']['error'] = 'Debes introducir un número positivo.';
+        return;
+    }
+    if($numero === 0 || $numero === 1){
+        $_SESSION['fibonacci']['resultado'] = "El número $numero pertenece a la sucesión de Fibonacci.";
+        return;
+    }
+    $valorA = 0;
+    $valorB = 1;
+    while($valorA < $numero){
+        $aux = $valorA + $valorB;
+        if($aux === $numero){
+            $_SESSION['fibonacci']['resultado'] = "El número $numero pertenece a la sucesión de Fibonacci.";
+            return;
+        }
+        $valorA = $valorB;
+        $valorB = $aux;
+    }
+    $_SESSION['fibonacci']['resultado'] = "El número $numero NO pertenece a la sucesión de Fibonacci.";
+    return;
+}
+
 if(isset($_POST['enviarBin'])){
     binarioToDecimal($_POST['binario']);
 }elseif(isset($_POST['enviarFec'])){
     calculadoraFecha($_POST['fecha']);
+}elseif(isset($_POST['enviarFor'])){
+    ordenaFormato($_POST['formato']);
+}elseif(isset($_POST['enviarGNot'])){
+    guardarNota($_POST['nota']);
+}elseif(isset($_POST['verNotas'])){
+    verNotas();
+}elseif(isset($_POST['enviarFib'])){
+    fibonacci($_POST['fibonacci']);
 }
-
 
 header('Location: index.php');
 die();
